@@ -72,3 +72,19 @@ Es una especificación de cómo un cliente debe solicitar que se busquen o modif
 ## Content Negotiation
 
 Tanto las peticiones del Cliente como las respuestas del Servidor deben tener el header -> 'Content-Type': 'application/vnd.api+json'
+
+---
+
+Usar blueprint para generar la estructura de datos
+
+1. composer require laravel-shift/blueprint –dev
+2. php artisan blueprint:new -> generará un draft.yaml para crear la estructura
+3. php artisan vendor:publish -> blueprint -> generará un /config/blueprint.php donde habrá que cambiar algunos datos
+4. php artisan blueprint:build
+
+---
+
+Modificar cosas útilies para usar la api
+
+-   En el routeServiceProvider se puede modificar el prefijo de todas las rutas del archivo api.php
+-   Recursos para poner informacón extra. Por ejemplo la estructura que debe tener un artículo
