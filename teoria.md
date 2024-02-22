@@ -88,3 +88,5 @@ Modificar cosas útilies para usar la api
 
 -   En el routeServiceProvider se puede modificar el prefijo de todas las rutas del archivo api.php
 -   Recursos para poner informacón extra. Por ejemplo la estructura que debe tener un artículo
+-   Colecciones (recursos) para poner información extra y global del contenido, no solo el 'data'. Si se sigue la convención de nombres, automáticamente, la colección va a envolver cada elemento en el Resource del mismo nombre.
+-
