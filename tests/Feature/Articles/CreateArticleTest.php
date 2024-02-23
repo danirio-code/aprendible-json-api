@@ -53,4 +53,69 @@ class CreateArticleTest extends TestCase {
       ]
     ]);
   }
+
+  /** @test */
+  public function title_is_required(): void {
+
+    $response = $this->postJson(route('api.v1.articles.create'), [
+      'data' => [
+        'type' => 'articles',
+        'attributes' => [
+          'slug' => 'nuevo-artículo',
+          'content' => 'Contenido del artículo',
+        ],
+      ]
+    ]);
+
+    $response->assertJsonValidationErrors('data.attributes.title');
+  }
+
+  /** @test */
+  public function slug_is_required(): void {
+
+    $response = $this->postJson(route('api.v1.articles.create'), [
+      'data' => [
+        'type' => 'articles',
+        'attributes' => [
+          'title' => 'Nuevo Artículo',
+          'content' => 'Contenido del artículo',
+        ],
+      ]
+    ]);
+
+    $response->assertJsonValidationErrors('data.attributes.slug');
+  }
+
+  /** @test */
+  public function content_is_required(): void {
+
+    $response = $this->postJson(route('api.v1.articles.create'), [
+      'data' => [
+        'type' => 'articles',
+        'attributes' => [
+          'title' => 'Nuevo Artículo',
+          'slug' => 'nuevo-artículo',
+        ],
+      ]
+    ]);
+
+    $response->assertJsonValidationErrors('data.attributes.content');
+  }
+
+  /** @test */
+  public function title_must_be_at_least_4_characters(): void {
+
+    $response = $this->postJson(route('api.v1.articles.create'), [
+      'data' => [
+        'type' => 'articles',
+        'attributes' => [
+          'title' => 'Nue',
+          'slug' => 'nuevo-artículo',
+          'content' => 'Contenido del artículo',
+        ],
+      ]
+    ]);
+
+    $response->assertJsonValidationErrors('data.attributes.title')->dump();
+  }
 }
