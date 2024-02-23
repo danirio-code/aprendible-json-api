@@ -90,4 +90,4 @@ Modificar cosas útilies para usar la api
 -   Recursos para poner informacón extra. Por ejemplo la estructura que debe tener un artículo
 -   Colecciones (recursos) para poner información extra y global del contenido, no solo el 'data'. Si se sigue la convención de nombres, automáticamente, la colección va a envolver cada elemento en el Resource del mismo nombre.
 -   La función setUp de los tests permite ejecutar código común para todos los tests del archivo, para evitar duplicar código. Es importante incluir parent::setUp()
--
+-   Para modificar el formato de los errores que devuelve un Json se puede sobreescribir el método 'invalidJson' del archivo 'App\Exceptions\Handler.php'
