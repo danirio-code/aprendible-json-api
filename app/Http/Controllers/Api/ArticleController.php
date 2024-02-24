@@ -9,16 +9,20 @@ use Illuminate\Http\Request;
 
 // use Illuminate\Http\Request;
 
-class ArticleController extends Controller {
-  public function show(Article $article): ArticleResource {
+class ArticleController extends Controller
+{
+  public function show(Article $article): ArticleResource
+  {
     return ArticleResource::make($article);
   }
 
-  public function index() {
+  public function index()
+  {
     return ArticleCollection::make(Article::all());
   }
 
-  public function create(Request $request) {
+  public function store(Request $request)
+  {
     $request->validate([
       'data.attributes.title' => ['required', 'min:4'],
       'data.attributes.slug' => ['required'],
