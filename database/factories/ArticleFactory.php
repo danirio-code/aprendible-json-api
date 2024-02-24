@@ -8,7 +8,8 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\User;
 
-class ArticleFactory extends Factory {
+class ArticleFactory extends Factory
+{
   /**
    * The name of the factory's corresponding model.
    *
@@ -19,7 +20,8 @@ class ArticleFactory extends Factory {
   /**
    * Define the model's default state.
    */
-  public function definition(): array {
+  public function definition(): array
+  {
     return [
       'title' => $this->faker->sentence(4),
       'slug' => $this->faker->slug(),

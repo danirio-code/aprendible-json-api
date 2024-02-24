@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Article;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveArticleRequest;
 use App\Http\Resources\{ArticleCollection, ArticleResource};
-use App\Models\Article;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 // use Illuminate\Http\Request;
 
@@ -22,7 +23,9 @@ class ArticleController extends Controller
   /** INDEX */
   public function index(): ArticleCollection
   {
-    return ArticleCollection::make(Article::all());
+    $articles = Article::allowedSorts(['title', 'content']);
+
+    return ArticleCollection::make($articles->get());
   }
 
   /** STORE */
