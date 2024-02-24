@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Articles;
 
-use App\Models\Article;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-// use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Article;
+// use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class CreateArticleTest extends TestCase {
+class CreateArticleTest extends TestCase
+{
   use RefreshDatabase;
 
-
   /** @test */
-  public function can_create_articles(): void {
+  public function can_create_articles(): void
+  {
     $this->withoutExceptionHandling();
 
     $response = $this->postJson(route('api.v1.articles.create'), [
@@ -23,9 +24,6 @@ class CreateArticleTest extends TestCase {
           'slug' => 'nuevo-artículo',
           'content' => 'Contenido del artículo',
         ],
-        // 'links' => [
-        //   'self' => route('api.v1.articles.show', $article)
-        // ]
       ]
     ]);
 
@@ -55,7 +53,8 @@ class CreateArticleTest extends TestCase {
   }
 
   /** @test */
-  public function title_is_required(): void {
+  public function title_is_required(): void
+  {
 
     $response = $this->postJson(route('api.v1.articles.create'), [
       'data' => [
@@ -65,23 +64,14 @@ class CreateArticleTest extends TestCase {
           'content' => 'Contenido del artículo',
         ],
       ]
-    ])->dump();
+    ]);
 
-    $response->assertJsonStructure([
-      'errors' => [
-        ['title', 'detail', 'source' => ['pointer']]
-      ]
-    ])->assertJsonFragment([
-      'source' => ['pointer' => '/data/attributes/title']
-    ])->assertHeader(
-      'content-type',
-      'application/vnd.api+json'
-    )->assertStatus(422);
-    // $response->assertJsonValidationErrors('data.attributes.title');
+    $response->assertJsonApiValidationErrors('title');
   }
 
   /** @test */
-  public function slug_is_required(): void {
+  public function slug_is_required(): void
+  {
 
     $response = $this->postJson(route('api.v1.articles.create'), [
       'data' => [
@@ -93,11 +83,12 @@ class CreateArticleTest extends TestCase {
       ]
     ]);
 
-    $response->assertJsonValidationErrors('data.attributes.slug');
+    $response->assertJsonApiValidationErrors('slug');
   }
 
   /** @test */
-  public function content_is_required(): void {
+  public function content_is_required(): void
+  {
 
     $response = $this->postJson(route('api.v1.articles.create'), [
       'data' => [
@@ -108,11 +99,12 @@ class CreateArticleTest extends TestCase {
         ],
       ]
     ]);
-    $response->assertJsonValidationErrors('data.attributes.content');
+    $response->assertJsonApiValidationErrors('content');
   }
 
   /** @test */
-  public function title_must_be_at_least_4_characters(): void {
+  public function title_must_be_at_least_4_characters(): void
+  {
 
     $response = $this->postJson(route('api.v1.articles.create'), [
       'data' => [
@@ -125,6 +117,6 @@ class CreateArticleTest extends TestCase {
       ]
     ]);
 
-    $response->assertJsonValidationErrors('data.attributes.title');
+    $response->assertJsonApiValidationErrors('title');
   }
 }
