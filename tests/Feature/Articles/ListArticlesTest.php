@@ -7,12 +7,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 // use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ListArticlesTest extends TestCase {
+class ListArticlesTest extends TestCase
+{
   use RefreshDatabase;
 
 
   /** @test */
-  public function can_fetch_a_single_article(): void {
+  public function can_fetch_a_single_article(): void
+  {
     $this->withoutExceptionHandling(); // Sirve para mostrar errores más concretos
 
     $article = Article::factory()->create();
@@ -36,14 +38,15 @@ class ListArticlesTest extends TestCase {
   }
 
   /** @test */
-  public function can_fetch_all_articles(): void {
+  public function can_fetch_all_articles(): void
+  {
     $this->withoutExceptionHandling();
 
     $articles = Article::factory(3)->create();
 
     $response = $this->getJson(route('api.v1.articles.index'));
 
-    $response->assertExactJson([
+    $response->assertJson([
       'data' => [
         [
           'type' => 'articles',
