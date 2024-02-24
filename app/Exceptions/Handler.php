@@ -35,15 +35,18 @@ class Handler extends ExceptionHandler
     $title = 'The given data was invalid';
 
     return response()->json([
-      'errors' => collect($exception->errors())->map(function ($message, $field) use ($title) {
-        return [
-          'title' => $title,
-          'detail' => $message[0],
-          'source' => [
-            'pointer' => '/' . str_replace('.', '/', $field)
-          ]
-        ];
-      })->values()
-    ], 422);
+      'errors' => collect($exception->errors())
+        ->map(function ($message, $field) use ($title) {
+          return [
+            'title' => $title,
+            'detail' => $message[0],
+            'source' => [
+              'pointer' => '/' . str_replace('.', '/', $field)
+            ]
+          ];
+        })->values()
+    ], 422, [
+      'Content-Type' => 'application/vnd.api+json'
+    ]);
   }
 }
