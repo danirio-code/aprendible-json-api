@@ -2,10 +2,11 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Validation\ValidationException;
 use Throwable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use App\Http\Responses\JsonApiValidationErrorResponse;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
@@ -30,8 +31,12 @@ class Handler extends ExceptionHandler
     });
   }
 
-  protected function invalidJson($request, ValidationException $exception): JsonApiValidationErrorResponse
+  protected function invalidJson($request, ValidationException $exception): JsonResponse
   {
-    return new JsonApiValidationErrorResponse($exception);
+    if (!$request->routeIs('api.v1.login')) {
+      return new JsonApiValidationErrorResponse($exception);
+    }
+
+    return parent::invalidJson($request, $exception);
   }
 }

@@ -84,10 +84,23 @@ Usar blueprint para generar la estructura de datos
 
 ---
 
-Modificar cosas útilies para usar la api
+Modificar cosas útilies para usar la api (mejorar)
 
 -   En el routeServiceProvider se puede modificar el prefijo de todas las rutas del archivo api.php
 -   Recursos para poner informacón extra. Por ejemplo la estructura que debe tener un artículo
 -   Colecciones (recursos) para poner información extra y global del contenido, no solo el 'data'. Si se sigue la convención de nombres, automáticamente, la colección va a envolver cada elemento en el Resource del mismo nombre.
 -   La función setUp de los tests permite ejecutar código común para todos los tests del archivo, para evitar duplicar código. Es importante incluir parent::setUp()
 -   Para modificar el formato de los errores que devuelve un Json se puede sobreescribir el método 'invalidJson' del archivo 'App\Exceptions\Handler.php'
+
+## TOKENS
+
+### Autenticación API (tokens)
+
+Un Token de API es un identificador único utilizado para hacer referencia a un usuario.
+Similar a la autenticación con usuario y contraseña.
+Los tokens API permiten la comunicación 'stateless' (en cada petición se debe indicar quién está realizando la petición)
+
+### Token Permissions (Abilities, Scopes)
+
+¿Qué puede hacer en la aplicación con ese Token?
+Un usuario puede tener múltiples tokens para acceder a la API y cada Token tiene sus permisos de acceso específicos.
