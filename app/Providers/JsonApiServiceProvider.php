@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 // use Illuminate\Testing\TestResponse;
-use Illuminate\Support\Str;
-use Illuminate\Database\Query\Builder;
+
+use App\JsonApi\JsonApiQueryBuilder;
+use App\JsonApi\JsonApiTestResponse;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Builder;
 
 class JsonApiServiceProvider extends ServiceProvider
 {
@@ -22,25 +25,8 @@ class JsonApiServiceProvider extends ServiceProvider
    */
   public function boot(): void
   {
+    Builder::mixin(new JsonApiQueryBuilder());
 
-    Builder::macro('allowedSorts', function (array $allowedSorts) {
-      /** @var Builder $this */
-
-      if (request()->filled('sort')) {
-        $sortFields = explode(',', request()->input('sort'));
-
-        foreach ($sortFields as $sortField) {
-          $sortDirection = Str::of($sortField)->startsWith('-') ? 'desc' : 'asc';
-
-          $sortField = Str::of($sortField)->ltrim('-');
-
-          abort_unless(in_array($sortField, $allowedSorts), 400, 'Invalid sort field');
-
-          $this->orderBy($sortField, $sortDirection);
-        }
-      }
-
-      return $this;
-    });
+    TestResponse::mixin(new JsonApiTestResponse());
   }
 }
