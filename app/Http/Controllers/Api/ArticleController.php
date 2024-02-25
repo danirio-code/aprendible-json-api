@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Article;
-use Illuminate\Support\Str;
+// use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
@@ -14,6 +14,12 @@ use App\Http\Resources\{ArticleCollection, ArticleResource};
 
 class ArticleController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('auth:sanctum')
+      ->only(['store', 'update', 'destroy']);
+  }
+
   /** SHOW */
   public function show(Article $article): ArticleResource
   {
@@ -31,7 +37,7 @@ class ArticleController extends Controller
   /** STORE */
   public function store(SaveArticleRequest $request): ArticleResource
   {
-    $article = Article::create($request->validated());
+    $article = Article::create($request->validated() + ['user_id' => auth()->id()]);
 
     return ArticleResource::make($article);
   }

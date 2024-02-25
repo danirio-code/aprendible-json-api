@@ -5,6 +5,7 @@ namespace Tests\Feature\Articles;
 use Tests\TestCase;
 // use Illuminate\Foundation\Testing\WithFaker;
 use App\Models\Article;
+use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UpdateArticleTest extends TestCase
@@ -13,15 +14,28 @@ class UpdateArticleTest extends TestCase
 
 
   /** @test */
-  public function can_update_articles(): void
+  public function guest_cannot_update_articles()
   {
     $article = Article::factory()->create();
 
+    $this->patchJson(route('api.v1.articles.update', $article))
+      ->assertUnauthorized();
+  }
+
+  /** @test */
+  public function can_update_articles()
+  {
+    $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
     $response = $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Updated Article',
-      'slug' => $article->slug,
-      'content' => 'Updated content',
+      'title' => 'Actualizado artículo',
+      'slug' =>  $article->slug,
+      'content' => 'Contenido del artículo actualizado'
     ])->assertOk();
+
+    $article = Article::first();
 
     $response->assertHeader(
       'Location',
@@ -31,11 +45,11 @@ class UpdateArticleTest extends TestCase
     $response->assertExactJson([
       'data' => [
         'type' => 'articles',
-        'id' => (string) $article->getRouteKey(),
+        'id' => (string)$article->getRouteKey(),
         'attributes' => [
-          'title' => 'Updated Article',
+          'title' => 'Actualizado artículo',
           'slug' => $article->slug,
-          'content' => 'Updated content',
+          'content' => 'Contenido del artículo actualizado'
         ],
         'links' => [
           'self' => route('api.v1.articles.show', $article)
@@ -45,107 +59,142 @@ class UpdateArticleTest extends TestCase
   }
 
   /** @test */
-  public function title_is_required(): void
+  public function title_is_required()
   {
     $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
     $this->patchJson(route('api.v1.articles.update', $article), [
-      'slug' => 'updated-article',
-      'content' => 'Updated content',
+      'slug' => 'actualizado-articulo',
+      'content' => 'Contenido del artículo actualizado'
     ])->assertJsonApiValidationErrors('title');
   }
 
   /** @test */
-  public function title_must_be_at_least_4_characters(): void
+  public function title_must_be_at_least_4_characters()
   {
     $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
     $this->patchJson(route('api.v1.articles.update', $article), [
       'title' => 'Nue',
-      'slug' => 'updated-article',
-      'content' => 'Updated content',
+      'slug' => 'actualizado-articulo',
+      'content' => 'Contenido del artículo actualizado'
     ])->assertJsonApiValidationErrors('title');
   }
 
   /** @test */
-  public function slug_is_required(): void
+  public function slug_is_required()
   {
     $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
     $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Updated Article',
-      'content' => 'Updated content',
+      'title' => 'Actualizado artículo',
+      'content' => 'Contenido del artículo actualizado'
     ])->assertJsonApiValidationErrors('slug');
   }
 
   /** @test */
-  public function slug_must_be_unique(): void
+  public function slug_must_contain_letters_numbers_and_dashes()
+  {
+    $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
+    $this->patchJson(route('api.v1.articles.update', $article), [
+
+      'title' => 'Nuevo Articulo',
+      'slug' => '$·%&/()=',
+      'content' => 'Contenido del artículo'
+
+    ])->assertJsonApiValidationErrors('slug');
+  }
+
+  /** @test */
+  public function slug_must_not_contain_underscores()
+  {
+    $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
+    $this->patchJson(route('api.v1.articles.update', $article), [
+
+      'title' => 'Nuevo Articulo',
+      'slug' => 'with_underscores',
+      'content' => 'Contenido del artículo'
+
+    ])->assertSee(__('validation.no_underscore', ['attribute' => 'slug']))
+      ->assertJsonApiValidationErrors('slug');
+  }
+
+  /** @test */
+  public function slug_must_not_start_with_dashes()
+  {
+    $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
+    $this->patchJson(route('api.v1.articles.update', $article), [
+
+      'title' => 'Nuevo Articulo',
+      'slug' => '-starts-with-dash',
+      'content' => 'Contenido del artículo'
+
+    ])->assertSee(__('validation.no_starting_dashes', ['attribute' => 'slug']))
+      ->assertJsonApiValidationErrors('slug');
+  }
+
+  /** @test */
+  public function slug_must_not_end_with_dashes()
+  {
+    $article = Article::factory()->create();
+
+    Sanctum::actingAs($article->user);
+
+    $this->patchJson(route('api.v1.articles.update', $article), [
+
+      'title' => 'Nuevo Articulo',
+      'slug' => 'starts-with-dash-',
+      'content' => 'Contenido del artículo'
+
+    ])->assertSee(__('validation.no_ending_dashes', ['attribute' => 'slug']))
+      ->assertJsonApiValidationErrors('slug');
+  }
+
+  /** @test */
+  public function slug_is_unique()
   {
     $article1 = Article::factory()->create();
     $article2 = Article::factory()->create();
 
+
+    Sanctum::actingAs($article1->user);
+
     $this->patchJson(route('api.v1.articles.update', $article1), [
-      'title' => 'Nuevo Artículo',
+
+      'title' => 'Nuevo Articulo',
       'slug' => $article2->slug,
-      'content' => 'Contenido del artículo',
+      'content' => 'Contenido del artículo'
+
     ])->assertJsonApiValidationErrors('slug');
   }
 
   /** @test */
-  public function slug_must_only_contain_letters_numbers_and_dashes(): void
+  public function content_is_required()
   {
     $article = Article::factory()->create();
 
-    $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Nuevo Artículo',
-      'slug' => '$%&',
-      'content' => 'Contenido del artículo',
-    ])->assertJsonApiValidationErrors('slug');
-  }
-
-  /** @test */
-  public function slug_must_not_contain_underscores(): void
-  {
-    $article = Article::factory()->create();
+    Sanctum::actingAs($article->user);
 
     $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Nuevo Artículo',
-      'slug' => 'with_underscore',
-      'content' => 'Contenido del artículo',
-    ])->assertSee(trans('validation.no_underscore', ['attribute' => 'slug']))
-      ->assertJsonApiValidationErrors('slug');
-  }
 
-  /** @test */
-  public function slug_must_not_start_with_dashes(): void
-  {
-    $article = Article::factory()->create();
+      'title' => 'Actualizado artículo',
+      'slug' => 'actualizado-articulo actualizado'
 
-    $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Nuevo Artículo',
-      'slug' => '-starts-with-dash',
-      'content' => 'Contenido del artículo',
-    ])->assertSee(trans('validation.no_starting_dashes', ['attribute' => 'slug']))
-      ->assertJsonApiValidationErrors('slug');
-  }
-
-  /** @test */
-  public function slug_must_not_end_with_dashes(): void
-  {
-    $article = Article::factory()->create();
-
-    $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Nuevo Artículo',
-      'slug' => 'ends-with-dash-',
-      'content' => 'Contenido del artículo',
-    ])->assertSee(trans('validation.no_ending_dashes', ['attribute' => 'slug']))
-      ->assertJsonApiValidationErrors('slug');
-  }
-
-  /** @test */
-  public function content_is_required(): void
-  {
-    $article = Article::factory()->create();
-    $this->patchJson(route('api.v1.articles.update', $article), [
-      'title' => 'Updated Article',
-      'slug' => 'updated-article',
     ])->assertJsonApiValidationErrors('content');
   }
 }

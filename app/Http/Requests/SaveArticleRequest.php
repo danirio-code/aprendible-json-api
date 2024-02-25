@@ -31,7 +31,7 @@ class SaveArticleRequest extends FormRequest
         new Slug(),
         Rule::unique('articles', 'slug')->ignore($this->route('article'))
       ],
-      'data.attributes.content' => ['required']
+      'data.attributes.content' => ['required'],
     ];
   }
 
