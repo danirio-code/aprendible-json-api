@@ -18,13 +18,12 @@ class CreateArticleTest extends TestCase
   {
     $user = User::factory()->create();
 
-    Sanctum::actingAs($user);
+    Sanctum::actingAs($user, ['*']);
 
     $response = $this->postJson(route('api.v1.articles.store'), [
       'title' => 'Nuevo artículo',
       'slug' => 'nuevo-articulo',
       'content' => 'Contenido del artículo',
-      'user_id' => $user->id,
     ])->assertCreated();
 
     $article = Article::first();

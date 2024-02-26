@@ -30,7 +30,7 @@ class LoginController extends Controller
       ]);
     }
     // generate the token
-    $plain_text_token = $user->createToken($request->device_name)->plainTextToken;
+    $plain_text_token = $user->createToken($request->device_name, ['articles:create'])->plainTextToken;
 
     return response()->json([
       'plain-text-token' => $plain_text_token,

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Article;
 // use Illuminate\Support\Str;
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveArticleRequest;
@@ -18,6 +18,8 @@ class ArticleController extends Controller
   {
     $this->middleware('auth:sanctum')
       ->only(['store', 'update', 'destroy']);
+
+    // $this->middleware('can:articles-create')->only('store');
   }
 
   /** SHOW */
@@ -37,6 +39,12 @@ class ArticleController extends Controller
   /** STORE */
   public function store(SaveArticleRequest $request): ArticleResource
   {
+    $user = $request->user();
+
+    if (!$user->tokenCan('articles:create')) {
+      abort(Response::HTTP_FORBIDDEN);
+    }
+
     $article = Article::create($request->validated() + ['user_id' => auth()->id()]);
 
     return ArticleResource::make($article);
